@@ -2,8 +2,8 @@
 
 Synthesizable SystemVerilog implementations of six fixed-point MARG attitude-estimation architectures for FPGA comparison:
 
-- Fixed-$\beta$ SAAM fusion
-- Confidence-gated dynamic-$\beta$ SAAM fusion
+- Fixed-β SAAM fusion
+- Confidence-gated dynamic-β SAAM fusion
 - **RGRSF** (Reliability-Gated Reference-Selective Fusion)
 - Mahony MARG observer
 - Madgwick MARG filter
@@ -11,13 +11,13 @@ Synthesizable SystemVerilog implementations of six fixed-point MARG attitude-est
 
 ## Main SAAM-family variants
 
-### Fixed $\beta$
+### Fixed β
 
 The baseline combines a SAAM reference quaternion with gyroscope propagation using a user-supplied constant fusion gain. It is the smallest SAAM-family reference implementation in this repository.
 
-### Dynamic $\beta$
+### Dynamic β
 
-This version retains the SAAM estimator but changes the correction weight according to acceleration consistency, magnetic-field consistency, magnetic observability, and quaternion innovation. The available gain levels are $\{0,\beta_0/4,\beta_0/2,\beta_0\}$ with hysteretic frame-based gating.
+This version retains the SAAM estimator but changes the correction weight according to acceleration consistency, magnetic-field consistency, magnetic observability, and quaternion innovation. The available gain levels are `0`, `β₀/4`, `β₀/2`, and `β₀`, with hysteretic frame-based gating.
 
 ### RGRSF
 
