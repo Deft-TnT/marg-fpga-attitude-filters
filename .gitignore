@@ -1,0 +1,42 @@
+# Vivado and FPGA build products
+.Xil/
+*.cache/
+*.hw/
+.sim/
+*.jou
+*.log
+*.str
+*.wdb
+*.wcfg
+*.xpr
+*.runs/
+*.gen/
+*.ip_user_files/
+*.bit
+*.bin
+*.ltx
+*.dcp
+*.rpt
+*.saif
+
+# Input data, simulation payloads, and generated artefacts
+sim/
+test*/
+tests/
+data/
+datasets/
+reports/
+results/
+*.csv
+*.mem
+*.coe
+*.npy
+*.mat
+*.zip
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+Desktop.ini
