@@ -23,6 +23,22 @@ This version retains the SAAM estimator but changes the correction weight accord
 
 RGRSF means **Reliability-Gated Reference-Selective Fusion**. It is the selective-reference extension of dynamic fusion. According to the reference-observation condition, it uses MARG correction, an IMU tilt correction, or gyro-only propagation, so an unreliable magnetic reference can be isolated without automatically discarding a usable gravity reference.
 
+## Conventional comparison implementations
+
+The following three implementations are included as independent comparison paths. They are not SAAM/RGRSF variants and are intended to make same-device, fixed-point FPGA comparisons possible.
+
+### Mahony MARG observer
+
+Mahony uses proportional-integral feedback derived from gravity and magnetic-reference errors to correct gyroscope propagation. It is a conventional lightweight nonlinear complementary observer used here as a reference baseline.
+
+### Madgwick MARG filter
+
+Madgwick computes a normalized gradient-descent correction from the inertial and magnetic measurement residuals, then combines it with the gyroscope update. It is included as a widely used gradient-based MARG comparison baseline.
+
+### Diagonal-covariance MEKF prototype
+
+This implementation is a resource-bounded multiplicative error-state Kalman-filter prototype with a diagonal covariance approximation. It is included for exploratory comparison only; it is not a full covariance MEKF implementation.
+
 ## Target and scope
 
 - Target synthesis device: **AMD/Xilinx Zynq-7000 XC7Z020-CLG400-2**.
@@ -57,7 +73,6 @@ The project is created under `vivado_<design>/`. The selected top module is repo
 
 ## Notes
 
-- The MEKF implementation is a resource-bounded diagonal-covariance research prototype, not a full covariance MEKF.
 - The Mahony and Madgwick paths are conventional comparison implementations and do not use the SAAM reference quaternion or rational normalizer.
 - Fixed-point formats, limits, and parameters are defined in the source. Use calibrated sensor inputs and validate parameter values for the intended sampling rate before hardware deployment.
 
