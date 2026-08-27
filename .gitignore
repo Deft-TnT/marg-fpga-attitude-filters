@@ -18,6 +18,8 @@
 *.dcp
 *.rpt
 *.saif
+*.exe
+software/arm_fp32_dynamic_rgrsf/build/
 
 # Input data, simulation payloads, and generated artefacts
 sim/
