@@ -48,6 +48,21 @@ This implementation is a resource-bounded multiplicative error-state Kalman-filt
 
 This repository intentionally publishes the algorithm RTL, shared arithmetic blocks, and a generic Vivado project-generation script only. It does **not** include board-specific pin assignments, packaged IP, PS/DMA designs, sensor drivers, input datasets, simulation test vectors, generated reports, checkpoints, or bitstreams. Integrators should add their own board wrapper, physical interface, calibration/configuration path, and verification data.
 
+## Cortex-A9 FP32 software baselines
+
+`software/arm_fp32_dynamic_rgrsf/` contains independent C99/FP32 software
+baselines for the two main adaptive SAAM-family methods:
+
+- dynamic-β v1; and
+- RGRSF (Reliability-Gated Reference-Selective Fusion).
+
+They deliberately use conventional IEEE-754 single precision and square-root
+normalization, rather than reproducing the Q30 RTL bit-for-bit. They are
+intended for an AMD/Xilinx Zynq-7000 Cortex-A9 Linux comparison and retain the
+same calibrated nine-axis input contract and frozen gate parameters as the
+associated RTL. The directory provides source and a Windows cross-build script,
+but no input data, run result, executable, board wrapper, or power claim.
+
 ## Directory layout
 
 ```text
@@ -59,6 +74,8 @@ rtl/mahony_madgwick/  conventional Mahony/Madgwick implementations
 rtl/mekf_diag/        diagonal-covariance MEKF research prototype
 constraints/          generic 50 MHz timing constraint
 scripts/              Vivado project generator
+software/arm_fp32_dynamic_rgrsf/
+                      C99 FP32 dynamic-β v1 and RGRSF ARM baselines
 ```
 
 ## Creating a Vivado project
