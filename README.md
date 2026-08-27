@@ -46,7 +46,7 @@ This implementation is a resource-bounded multiplicative error-state Kalman-filt
 - Inputs use the shared 11-word streaming frame: `ax ay az mx my mz wx wy wz dt beta/config`.
 - Outputs use five words: `qw qx qy qz status`.
 
-This repository intentionally publishes the algorithm RTL, shared arithmetic blocks, and a generic Vivado project-generation script only. It does **not** include board-specific pin assignments, packaged IP, PS/DMA designs, sensor drivers, input datasets, simulation test vectors, generated reports, checkpoints, or bitstreams. Integrators should add their own board wrapper, physical interface, calibration/configuration path, and verification data.
+This repository intentionally publishes algorithm RTL, shared arithmetic blocks, a narrow pair of portable FP32 software baselines, and a generic Vivado project-generation script. It does **not** include board-specific pin assignments, packaged IP, PS/DMA designs, sensor drivers, input datasets, simulation test vectors, generated reports, checkpoints, or bitstreams. Integrators should add their own board wrapper, physical interface, calibration/configuration path, and verification data.
 
 ## Cortex-A9 FP32 software baselines
 
