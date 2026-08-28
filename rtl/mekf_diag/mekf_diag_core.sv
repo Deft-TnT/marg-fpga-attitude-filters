@@ -1,5 +1,8 @@
 // Created by Wang Jialin.
 // See README.md for interfaces and usage.
+// Experimental diagonal-covariance multiplicative EKF comparison core.
+// It propagates attitude and gyro-bias states, then applies a gravity/magnetic measurement correction.
+// This is a resource-reduced prototype, not a full coupled-covariance MEKF implementation.
 
 `timescale 1ns/1ps
 module mekf_diag_core #(
@@ -27,6 +30,7 @@ module mekf_diag_core #(
 );
     import ahrs_fixed_pkg::*;
 
+    // The FSM serializes the prediction, correction, covariance, and output stages.
     typedef enum logic [5:0] {
         IDLE, AN_START, AN_WAIT, MN_START, MN_WAIT,
         QDOT_START, QDOT_WAIT, QDOT_CALC, DT_START, DT_WAIT, PRED_CALC, QP_START, QP_WAIT,

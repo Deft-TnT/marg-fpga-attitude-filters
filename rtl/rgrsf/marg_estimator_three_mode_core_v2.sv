@@ -1,5 +1,10 @@
 // Created by Wang Jialin.
 // See README.md for interfaces and usage.
+// RGRSF (Reliability-Gated Reference-Selective Fusion) MARG attitude-estimation core.
+// It selects one reference policy per frame: full MARG correction, yaw-preserving IMU tilt correction,
+// or gyro-only propagation when the gravity reference is unreliable.
+// Reliability is evaluated from sensor magnitudes, magnetic observability, quaternion innovation,
+// predicted-gravity alignment, and horizontal magnetic-direction alignment.
 
 `timescale 1ns/1ps
 module marg_estimator_three_mode_core #(
@@ -132,6 +137,7 @@ module marg_estimator_three_mode_core #(
     logic        [31:0] dt_l, beta_l;
     logic        [31:0] beta_active_l, one_minus_beta_active_l;
 
+    // MARG uses SAAM; IMU_TILT rejects magnetic heading but retains gravity tilt; GYRO_ONLY rejects both references.
     localparam logic [1:0] MODE_MARG      = 2'd0;
     localparam logic [1:0] MODE_IMU_TILT  = 2'd1;
     localparam logic [1:0] MODE_GYRO_ONLY = 2'd2;
@@ -283,6 +289,7 @@ module marg_estimator_three_mode_core #(
         end
     endfunction
 
+    // Convert per-frame quality indicators into a raw candidate mode and a dynamic β level.
     always_comb begin
         saam_az_minus_one = sat_s33_to_s32(
             $signed({az_u[31], az_u}) - $signed({ONE_Q30[31], ONE_Q30})
@@ -426,6 +433,7 @@ module marg_estimator_three_mode_core #(
         end
     end
 
+    // Degradation is immediate after the configured bad-frame count; recovery advances one mode at a time.
     always_comb begin
         mode_decided_comb = mode_l;
         if (candidate_raw_mode > mode_l) begin
@@ -1255,6 +1263,7 @@ module marg_estimator_three_mode_core #(
                     state <= C_MODE_DECIDE;
                 end
 
+                // Latch diagnostics and select the MARG, IMU-tilt, or gyro-only reference path.
                 C_MODE_DECIDE: begin
                     raw_level_l <= candidate_raw_level;
                     raw_level_out <= candidate_raw_level;
@@ -1731,6 +1740,7 @@ module marg_estimator_three_mode_core #(
                     state <= C_OUTPUT;
                 end
 
+                // State is committed only when the consumer accepts the output frame.
                 C_OUTPUT: begin
                     if (out_valid && out_ready) begin
                         if (commit_pending) begin

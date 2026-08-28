@@ -1,5 +1,8 @@
 // Created by Wang Jialin.
 // See README.md for interfaces and usage.
+// Shared conventional MARG core used for the Mahony and Madgwick comparison baselines.
+// FILTER_MODE=0 selects Mahony PI feedback; FILTER_MODE=1 selects Madgwick gradient feedback.
+// This path uses standard square-root/division normalization and is independent of SAAM/RGRSF logic.
 
 `timescale 1ns/1ps
 module standard_marg_core_shared #(
@@ -25,6 +28,7 @@ module standard_marg_core_shared #(
 );
     import ahrs_fixed_pkg::*;
 
+    // A sequential FSM reuses multiplication, division, square-root, and normalization operators.
     typedef enum logic [5:0] {
         IDLE,
         ACC_N_START, ACC_N_WAIT, MAG_N_START, MAG_N_WAIT,

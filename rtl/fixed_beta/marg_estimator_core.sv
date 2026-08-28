@@ -1,5 +1,7 @@
 // Created by Wang Jialin.
 // See README.md for interfaces and usage.
+// Fixed-β MARG estimator: SAAM observation and gyro propagation are fused once per input frame.
+// The recursive quaternion state is updated only after the output valid/ready handshake.
 
 `timescale 1ns/1ps
 module marg_estimator_core #(
@@ -41,6 +43,7 @@ module marg_estimator_core #(
     localparam logic [7:0] ST_BETA_CLAMPED    = 8'h20;
     localparam logic [7:0] ST_NO_STATE         = 8'h40;
 
+    // One shared sequential arithmetic path trades latency for low DSP usage.
     typedef enum logic [5:0] {
         C_IDLE,
         C_NORM_A_START, C_NORM_A_WAIT,

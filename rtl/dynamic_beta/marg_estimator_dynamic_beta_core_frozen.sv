@@ -1,5 +1,7 @@
 // Created by Wang Jialin.
 // See README.md for interfaces and usage.
+// Dynamic-β SAAM estimator with discrete reliability gating: β, β/2, β/4, or gyro-only.
+// Raw sensor magnitudes, magnetic observability, and quaternion innovation choose the correction level.
 
 `timescale 1ns/1ps
 module marg_estimator_dynamic_beta_core #(
@@ -72,6 +74,7 @@ module marg_estimator_dynamic_beta_core #(
     localparam logic [7:0] DYN_FLAG_REDUCED    = 8'h10;
     localparam logic [7:0] DYN_FLAG_RECOVERY   = 8'h20;
 
+    // The FSM reuses arithmetic hardware and commits both attitude and gate state atomically.
     typedef enum logic [5:0] {
         C_IDLE,
         C_CONF_NORM_INIT, C_CONF_NORM_MUL_START, C_CONF_NORM_MUL_WAIT, C_CONF_NORM_FINAL,

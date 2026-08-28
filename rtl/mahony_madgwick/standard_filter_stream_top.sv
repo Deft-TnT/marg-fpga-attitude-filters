@@ -1,5 +1,7 @@
 // Created by Wang Jialin.
 // See README.md for interfaces and usage.
+// AXI-Stream-style wrapper for the conventional Mahony/Madgwick shared core.
+// mahony_marg_top selects FILTER_MODE=0; madgwick_marg_top selects FILTER_MODE=1.
 
 `timescale 1ns/1ps
 module standard_filter_stream_top #(
