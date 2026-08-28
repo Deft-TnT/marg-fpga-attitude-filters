@@ -1,3 +1,5 @@
+# Created by Wang Jialin. See README.md for build and usage.
+
 param(
     [switch]$HostOnly,
     [switch]$ArmOnly,

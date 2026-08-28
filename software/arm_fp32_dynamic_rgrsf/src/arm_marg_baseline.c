@@ -1,12 +1,5 @@
-/*
- * ARM FP32 software baseline for the frozen dynamic-beta-v1 and RGRSF MARG
- * estimators.  This program is intentionally independent of the RTL: it
- * uses IEEE-754 single precision and standard square-root normalization.
- *
- * Target runtime: Zynq-7000 Cortex-A9 Linux (hard-float, NEON-capable).
- * Host execution is permitted for functional validation only; its timing is
- * not an ARM measurement.
- */
+/* Created by Wang Jialin. See README.md for build and usage. */
+
 #ifndef _WIN32
 #define _POSIX_C_SOURCE 200809L
 #endif
@@ -32,10 +25,10 @@ typedef struct { float x, y, z; } vec3_t;
 typedef struct { float w, x, y, z; } quat_t;
 
 typedef struct {
-    vec3_t accel;          /* Already mapped to the SAAM core convention. */
+    vec3_t accel;
     vec3_t mag;
     vec3_t gyro_rad_s;
-    quat_t q_truth_mapped; /* [qx_true, -qw_true, qz_true, -qy_true]. */
+    quat_t q_truth_mapped;
     float dt_s;
     uint8_t disturbance_flags;
 } sample_t;
@@ -56,7 +49,7 @@ typedef struct {
 typedef struct {
     quat_t q;
     int have_state;
-    int beta_level; /* 0 reject, 1 quarter, 2 half, 3 nominal. */
+    int beta_level;
     int beta_bad_count, beta_good_count;
     int mode;
     int mode_bad_count, mode_good_count;
@@ -176,7 +169,7 @@ static observation_t saam_observation(vec3_t a_raw, vec3_t m_raw) {
         a.z*md - a.x*mn - m.z,
         a.x*m.y - a.y*(mn + m.x)
     };
-    /* Equation (6) is followed by the paper-mandated [q3,q0,q1,q2] reorder. */
+
     const quat_t q_reordered = {qtilde.z, qtilde.w, qtilde.x, qtilde.y};
     obs.available = quat_normalize(q_reordered, &obs.q_saam);
     return obs;
@@ -272,7 +265,7 @@ static quat_t dynamic_step(estimator_t *s, const parameters_t *p, const sample_t
     quat_t qgyro;
     if (!s->have_state) {
         if (!obs.available) { *beta_level = s->beta_level; *mode = MODE_GYRO_ONLY; return s->q; }
-        /* Match the RTL: the first valid SAAM quaternion is an absolute-state seed. */
+
         s->q = obs.q_saam; s->have_state = 1;
         *beta_level = s->beta_level; *mode = MODE_MARG; return s->q;
     } else {
@@ -304,7 +297,7 @@ static void update_mode_hysteresis(estimator_t *s, const parameters_t *p, int de
         s->mode_bad_count = 0;
         ++s->mode_good_count;
         if (s->mode_good_count >= p->good_frame_count) {
-            --s->mode; /* gradual recovery: gyro -> IMU -> MARG */
+            --s->mode;
             s->mode_good_count = 0;
         }
     } else {
@@ -319,7 +312,7 @@ static quat_t rgrsf_step(estimator_t *s, const parameters_t *p, const sample_t *
     quat_t qgyro;
     if (!s->have_state) {
         if (!obs.available) { *beta_level = 0; *mode = MODE_GYRO_ONLY; return s->q; }
-        /* Match the RTL: initialize from the first valid absolute MARG observation. */
+
         s->q = obs.q_saam; s->have_state = 1; s->mode = MODE_MARG;
         *beta_level = s->beta_level; *mode = s->mode; return s->q;
     } else {
@@ -386,7 +379,7 @@ static quat_t estimator_step(estimator_t *s, const parameters_t *p, method_t met
 static float geodesic_deg(quat_t q, quat_t truth) {
     q = sign_align(truth, q);
     const float d = clampf(fabsf(quat_dot(q, truth)), 0.0f, 1.0f);
-    return 114.59155902616465f * acosf(d); /* 2 * 180/pi */
+    return 114.59155902616465f * acosf(d);
 }
 
 static int cmp_float(const void *a, const void *b) {
@@ -479,7 +472,7 @@ static int load_dataset(const char *path, sample_t **out_samples, size_t *out_co
     FILE *stream = fopen(path, "rb");
     if (!stream) { fprintf(stderr, "Cannot open %s: %s\n", path, strerror(errno)); return 0; }
     char line[8192];
-    if (!fgets(line, sizeof(line), stream)) { fclose(stream); return 0; } /* CSV header */
+    if (!fgets(line, sizeof(line), stream)) { fclose(stream); return 0; }
     size_t capacity = 20000, count = 0;
     sample_t *samples = (sample_t *)malloc(capacity*sizeof(*samples));
     if (!samples) { fclose(stream); return 0; }
@@ -494,7 +487,7 @@ static int load_dataset(const char *path, sample_t **out_samples, size_t *out_co
             samples = next;
         }
         sample_t *s = &samples[count++];
-        /* Coordinate adapter must match the existing SAAM RTL preparation. */
+
         s->accel.x = -strtof(f[20], NULL); s->accel.y = -strtof(f[21], NULL); s->accel.z = -strtof(f[22], NULL);
         s->gyro_rad_s.x = strtof(f[23], NULL); s->gyro_rad_s.y = strtof(f[24], NULL); s->gyro_rad_s.z = strtof(f[25], NULL);
         s->mag.x = strtof(f[26], NULL); s->mag.y = strtof(f[27], NULL); s->mag.z = strtof(f[28], NULL);
